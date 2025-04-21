@@ -30,7 +30,9 @@ namespace Auto_Correlation
         public static List<string> r_Value_bat = new List<string>();
         
         //Correation 연산을 위한 객체 생성
-        public Auto_Correlation.Data_Calculator cal_data = new Auto_Correlation.Data_Calculator();
+        public Auto_Correlation.Data_Calculator calNewData = new Auto_Correlation.Data_Calculator();
+        public Auto_Correlation.Data_Calculator calOldData = new Auto_Correlation.Data_Calculator();
+
 
         //Correation 초기파일을 저장하기 위한 클래스 객체 생성
         public Correlation_Notepad cor_to_note = new Correlation_Notepad();
@@ -48,6 +50,7 @@ namespace Auto_Correlation
             txtBox_std.Text = text;
         }
 
+        #region 이벤트
         //25.04.08 KDK
         #region Open 버튼 이벤트
         private void Open_Click(object sender, EventArgs e)
@@ -135,35 +138,34 @@ namespace Auto_Correlation
                         }
                     }
 
-                    //25.04.16 - KDK
-                    //Correlation
-                    //Data_cal 클래스에 std, bat 데이터 넣기
-                    cal_data.string_r_Value_std = r_Value_std;
-                    cal_data.string_r_Value_bat = r_Value_bat;
+                    ////25.04.16 - KDK
+                    ////Correlation
+                    ////Data_cal 클래스에 std, bat 데이터 넣기
+                    //calNewData.string_r_Value_std = r_Value_std;
+                    //calNewData.string_r_Value_bat = r_Value_bat;
 
-                    //string data -> double parse
-                    cal_data.parse_list_double(cal_data.string_r_Value_std, cal_data.string_r_Value_bat);
+                    ////string data -> double parse
+                    //calNewData.parse_list_double(calNewData.string_r_Value_std, calNewData.string_r_Value_bat);
 
-                    //alpha, beta값 계산
-                    cal_data.cal_alpha(cal_data.double_r_Value_std, cal_data.double_r_Value_bat);
-                    cal_data.cal_beta(cal_data.double_r_Value_std, cal_data.double_r_Value_bat);
+                    ////alpha, beta값 계산
+                    //calNewData.cal_alpha(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+                    //calNewData.cal_beta(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
                     
-                    //eta 기준값 생성
-                    cal_data.make_bench_eta(cal_data.benchmark_eta);
+                    ////eta 기준값 생성
+                    //calNewData.make_bench_eta(calNewData.benchmark_eta);
                     
-                    //eta 변화값 생성
-                    cal_data.make_list_change_val_std(cal_data.double_r_Value_std, cal_data.double_r_eta_std, cal_data.benchmark_eta);
+                    ////eta 변화값 생성
+                    //calNewData.make_list_change_val_std(calNewData.double_r_Value_std, calNewData.double_r_eta_std, calNewData.benchmark_eta);
 
-                    cal_data.cal_eta(cal_data.double_r_eta_std, cal_data.beta);
+                    //calNewData.cal_eta(calNewData.double_r_eta_std, calNewData.beta);
 
-                    //메모장 생성
-                    val_name = "ALPHA";
-                    cor_to_note.content = cor_to_note.Make_cor_value(cal_data.alpha, cal_data.beta, cal_data.eta, val_name);
+                    ////메모장 생성
+                    //val_name = "ALPHA";
 
-                    //Correation 메모장 파일 저장
-                    cor_to_note.Save_CorrelatationFile(cor_to_note.content);
-
-                    ;
+                    //cor_to_note.content = Correlation_Content_NewAll(cor_to_note, calNewData);
+                    ////Correation 메모장 파일 저장
+                    //cor_to_note.Save_CorrelatationFile(cor_to_note.content);
+                    //;
 
                 }
                 catch (SecurityException ex)
@@ -174,6 +176,211 @@ namespace Auto_Correlation
             }
         }
         #endregion
+        //25.04.17 KDK
+        #region 종료 버튼 이벤트
+        private void btn_exit_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+        #endregion
+        #endregion
+
+        #region 메서드
+        
+        public void OpenCorFile()
+        {
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = ofd.SafeFileName;
+                string fileFullName = ofd.FileName;
+                string filePath = fileFullName.Replace(fileName, "");
+
+                //corfile 리딩
+                /* 구분자 \n
+                 * 파일 전체 읽어서 변수에 담기
+                 * 이후 list에 담기
+                 * list에 담을때 [SCI_Coefficients] 기준
+                 * SCI_ALPHA_Coefficients 부터 내용 담기
+                 * 담을때 key value? 360 ~ 750
+                 * SCI_LAMBDA_Coefficients 만나서 끝 값 ,0 넣으면 끝
+                 */
+
+                try
+                {
+                    var sr = new StreamReader(ofd.FileName);
+
+                    //메모장 내용 불러오기
+                    string content = sr.ReadToEnd();
+                    string temp = "";
+                    //%R data arr_data에 저장
+                    string[] arr_data = content.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+
+                    //메모장 내용 분류 및 알파, 베타, 에타 데이터 만들기
+                    for (int i = 0; i < arr_data.Length; i++)
+                    {
+                        string type = "";
+                    
+                        if (arr_data[i] == "[SCI_Coefficients]")
+                        {
+                            //alpha
+                            if (arr_data[i+3].Substring(0,22) == "SCI_ALPHA_Coefficients")
+                            {
+                                type = "alpha";
+                                temp = arr_data[i + 3].Substring(23);
+                                string[] subWave = temp.Split(',');
+                                foreach (string s in subWave) 
+                                {
+                                    calOldData.string_wave_data.Add(s);
+                                }
+                                calOldData.parse_list_double(calOldData.string_wave_data, type);
+                                calOldData.string_wave_data.Clear();
+                                type = "";
+                                temp = "";
+                            }
+                            //beta
+                            if (arr_data[i + 4].Substring(0, 21) == "SCI_BETA_Coefficients")
+                            {
+                                type = "beta";
+                                temp = arr_data[i + 4].Substring(22);
+                                string[] subWave = temp.Split(',');
+                                foreach (string s in subWave)
+                                {
+                                    calOldData.string_wave_data.Add(s);
+                                }
+                                calOldData.parse_list_double(calOldData.string_wave_data, type);
+                                calOldData.string_wave_data.Clear();
+                                type = "";
+                                temp = "";
+                            }
+                            //eta
+                            if (arr_data[i + 7].Substring(0, 20) == "SCI_ETA_Coefficients")
+                            {
+                                type = "eta";
+                                temp = arr_data[i + 7].Substring(21);
+                                string[] subWave = temp.Split(',');
+                                foreach (string s in subWave)
+                                {
+                                    calOldData.string_wave_data.Add(s);
+                                }
+                                calOldData.parse_list_double(calOldData.string_wave_data, type);
+                                calOldData.string_wave_data.Clear();
+                                type = "";
+                                temp = "";
+                                ;
+                            }
+                        }
+                    }
+                }
+                catch (SecurityException ex)
+                {
+                    MessageBox.Show($"Security error.\n\nError message: {ex.Message}\n\n" +
+                    $"Details:\n\n{ex.StackTrace}");
+                }
+            }
+        }
+
+        //Correlation 메모장 내용 생성 메서드
+        public string Correlation_Content_NewAll(Correlation_Notepad cor, Data_Calculator dt) 
+        {
+            string content = "";
+            content = cor.Make_cor_value(dt.alpha, dt.beta, dt.eta, val_name);
+            return content;
+        }
+        public string Correlation_Content_NewAlpha(Correlation_Notepad cor, Data_Calculator dtNew, Data_Calculator dtOld)
+        {
+            string content = "";
+            content = cor.Make_cor_value(dtNew.alpha, dtOld.beta, dtOld.eta, val_name);
+            return content;
+        }
+
+        public string Correlation_Content_NewBeta(Correlation_Notepad cor, Data_Calculator dtNew, Data_Calculator dtOld)
+        {
+            string content = "";
+            content = cor.Make_cor_value(dtOld.alpha, dtNew.beta, dtOld.eta, val_name);
+            return content;
+        }
+
+        public string Correlation_Content_NewEta(Correlation_Notepad cor, Data_Calculator dtNew, Data_Calculator dtOld)
+        {
+            string content = "";
+            content = cor.Make_cor_value(dtOld.alpha, dtOld.beta, dtNew.eta, val_name);
+            return content;
+        }
+
+        #endregion
+
+        private void btn_cor_btn_Click(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Button btn = new System.Windows.Forms.Button();
+            btn = sender as System.Windows.Forms.Button;
+            string type = "";
+            type = btn.Tag.ToString();
+
+            //25.04.16 - KDK
+            //Correlation
+            //Data_cal 클래스에 std, bat 데이터 넣기
+            calNewData.string_r_Value_std = r_Value_std;
+            calNewData.string_r_Value_bat = r_Value_bat;
+
+            //string data -> double parse
+            calNewData.parse_list_double(calNewData.string_r_Value_std, calNewData.string_r_Value_bat);
+
+            if (type == "alpha")
+            {
+                //alpha값 계산
+                calNewData.cal_alpha(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+
+                //25.04.21 - KDK
+                /* 해당 내용 Make_cor_value() 이용해서 처리하기
+                List<double> temp = new List<double>();
+                //기존값과 새로운값 연산 - alpha, 곱하기
+                for (int i = 0; i < calNewData.alpha.Count; i++)
+                {
+                    double result = 0;
+                    result = calNewData.alpha[i] * calOldData.alpha[i];
+                    temp.Add(result);
+                }
+                ;
+                calNewData.alpha.Clear();
+                calNewData.alpha = temp;
+                */
+                cor_to_note.content = Correlation_Content_NewAlpha(cor_to_note, calNewData, calOldData);
+                //Correation 메모장 파일 저장
+                cor_to_note.Save_CorrelatationFile(cor_to_note.content);
+            }
+
+            if (type == "beta")
+            {
+                //beta값 계산
+                calNewData.cal_beta(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+                cor_to_note.content = Correlation_Content_NewBeta(cor_to_note, calNewData, calOldData);
+                //Correation 메모장 파일 저장
+                cor_to_note.Save_CorrelatationFile(cor_to_note.content);
+            }
+
+            if (type == "eta")
+            {
+                //eta 기준값 생성
+                calNewData.make_bench_eta(calNewData.benchmark_eta);
+
+                //eta 변화값 생성
+                calNewData.make_list_change_val_std(calNewData.double_r_Value_std, calNewData.double_r_eta_std, calNewData.benchmark_eta);
+                
+                //eta 값 계산
+                calNewData.cal_eta(calNewData.double_r_eta_std, calNewData.beta);
+
+                cor_to_note.content = Correlation_Content_NewEta(cor_to_note, calNewData, calOldData);
+                //Correation 메모장 파일 저장
+                cor_to_note.Save_CorrelatationFile(cor_to_note.content);
+            }
+            //메모장 생성
+            val_name = "ALPHA";
+        }
+
+        private void btn_open_cor_Click(object sender, EventArgs e)
+        {
+            OpenCorFile();
+        }
     }
 }
 

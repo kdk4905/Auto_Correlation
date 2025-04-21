@@ -11,9 +11,13 @@ namespace Auto_Correlation
         //public readonly struct KeyValuePair<TKey, TValue> { }
 
         //필드
+        
         //std, bat string 데이터 저장 리스트
         public List<string> string_r_Value_std = new List<string>();
         public List<string> string_r_Value_bat = new List<string>();
+
+        //cor File string 데이터 저장 리스트
+        public List<string> string_wave_data = new List<string>();
 
         //std, bat float 데이터 저장 리스트
         public List<double> double_r_Value_std  = new List<double>();
@@ -307,6 +311,27 @@ namespace Auto_Correlation
             }
         }
 
+        public void parse_list_double(List<string> wave, string type)
+        {
+            for (int i = 0; i < wave.Count; i++)
+            {
+                if (type == "alpha") 
+                {
+                    alpha.Add(double.Parse(wave[i]));
+                }
+
+                if (type == "beta")
+                {
+                    beta.Add(double.Parse(wave[i]));
+                }
+
+                if (type == "eta")
+                {
+                    eta.Add(double.Parse(wave[i]));
+                }
+            }
+        }
+
         public void parse_list_double(List<string> std, List<string> bat) 
         {
             for (int i = 0; i < std.Count; i++) 
@@ -333,7 +358,6 @@ namespace Auto_Correlation
                 double val = Math.Round(std[i] / bat[i] , 8);
                 alpha.Add(val);
             }
-        
         }
 
         public void cal_beta(List<double> std, List<double> bat)
