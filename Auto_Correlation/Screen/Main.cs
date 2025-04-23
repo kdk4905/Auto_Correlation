@@ -26,13 +26,12 @@ namespace Auto_Correlation
     {
         private OpenFileDialog ofd = new OpenFileDialog();
         //std, bat list 생성
-        public static List<string> r_Value_std = new List<string>();
-        public static List<string> r_Value_bat = new List<string>();
+        public List<string> r_Value_std = new List<string>();
+        public List<string> r_Value_bat = new List<string>();
         
         //Correation 연산을 위한 객체 생성
         public Auto_Correlation.Data_Calculator calNewData = new Auto_Correlation.Data_Calculator();
         public Auto_Correlation.Data_Calculator calOldData = new Auto_Correlation.Data_Calculator();
-
 
         //Correation 초기파일을 저장하기 위한 클래스 객체 생성
         public Correlation_Notepad cor_to_note = new Correlation_Notepad();
@@ -53,8 +52,15 @@ namespace Auto_Correlation
         #region 이벤트
         //25.04.08 KDK
         #region Open 버튼 이벤트
-        private void Open_Click(object sender, EventArgs e)
+        private void R_File_Open_Click(object sender, EventArgs e)
         {
+            //리스트 클리어
+            ResetListAll();
+
+            //text box 클리어
+            txtBox_std.Text = "";
+            txtBox_bat.Text = "";
+
             if (ofd.ShowDialog() == DialogResult.OK) 
             {
                 string fileName = ofd.SafeFileName;
@@ -225,6 +231,7 @@ namespace Auto_Correlation
                             //alpha
                             if (arr_data[i+3].Substring(0,22) == "SCI_ALPHA_Coefficients")
                             {
+                                int count = 0;
                                 type = "alpha";
                                 temp = arr_data[i + 3].Substring(23);
                                 string[] subWave = temp.Split(',');
@@ -232,6 +239,9 @@ namespace Auto_Correlation
                                 {
                                     calOldData.string_wave_data.Add(s);
                                 }
+                                //공백 삭제
+                                calOldData.string_wave_data.Remove("");
+                                
                                 calOldData.parse_list_double(calOldData.string_wave_data, type);
                                 calOldData.string_wave_data.Clear();
                                 type = "";
@@ -247,6 +257,9 @@ namespace Auto_Correlation
                                 {
                                     calOldData.string_wave_data.Add(s);
                                 }
+
+                                calOldData.string_wave_data.Remove("");
+
                                 calOldData.parse_list_double(calOldData.string_wave_data, type);
                                 calOldData.string_wave_data.Clear();
                                 type = "";
@@ -262,6 +275,9 @@ namespace Auto_Correlation
                                 {
                                     calOldData.string_wave_data.Add(s);
                                 }
+
+                                calOldData.string_wave_data.Remove("");
+                                
                                 calOldData.parse_list_double(calOldData.string_wave_data, type);
                                 calOldData.string_wave_data.Clear();
                                 type = "";
@@ -280,33 +296,33 @@ namespace Auto_Correlation
         }
 
         //Correlation 메모장 내용 생성 메서드
-        public string Correlation_Content_NewAll(Correlation_Notepad cor, Data_Calculator dt) 
+        public string Correlation_Content_NewAll(Correlation_Notepad cor, Data_Calculator dtNew) 
         {
             string content = "";
-            content = cor.Make_cor_value(dt.alpha, dt.beta, dt.eta, val_name);
+            content = cor.Make_cor_value_allNew(dtNew.alpha, dtNew.beta, dtNew.eta);
             return content;
         }
+
         public string Correlation_Content_NewAlpha(Correlation_Notepad cor, Data_Calculator dtNew, Data_Calculator dtOld)
         {
             string content = "";
-            content = cor.Make_cor_value(dtNew.alpha, dtOld.beta, dtOld.eta, val_name);
+            content = cor.Make_cor_value_alpha(dtNew.alpha, dtOld.alpha, dtOld.beta, dtOld.eta);
             return content;
         }
 
         public string Correlation_Content_NewBeta(Correlation_Notepad cor, Data_Calculator dtNew, Data_Calculator dtOld)
         {
             string content = "";
-            content = cor.Make_cor_value(dtOld.alpha, dtNew.beta, dtOld.eta, val_name);
+            content = cor.Make_cor_value_beta(dtNew.beta, dtOld.alpha, dtOld.beta, dtOld.eta);
             return content;
         }
 
         public string Correlation_Content_NewEta(Correlation_Notepad cor, Data_Calculator dtNew, Data_Calculator dtOld)
         {
             string content = "";
-            content = cor.Make_cor_value(dtOld.alpha, dtOld.beta, dtNew.eta, val_name);
+            content = cor.Make_cor_value_eta(dtNew.eta, dtOld.alpha, dtOld.beta, dtOld.eta);
             return content;
         }
-
         #endregion
 
         private void btn_cor_btn_Click(object sender, EventArgs e)
@@ -319,6 +335,7 @@ namespace Auto_Correlation
             //25.04.16 - KDK
             //Correlation
             //Data_cal 클래스에 std, bat 데이터 넣기
+            ;
             calNewData.string_r_Value_std = r_Value_std;
             calNewData.string_r_Value_bat = r_Value_bat;
 
@@ -330,21 +347,8 @@ namespace Auto_Correlation
                 //alpha값 계산
                 calNewData.cal_alpha(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
 
-                //25.04.21 - KDK
-                /* 해당 내용 Make_cor_value() 이용해서 처리하기
-                List<double> temp = new List<double>();
-                //기존값과 새로운값 연산 - alpha, 곱하기
-                for (int i = 0; i < calNewData.alpha.Count; i++)
-                {
-                    double result = 0;
-                    result = calNewData.alpha[i] * calOldData.alpha[i];
-                    temp.Add(result);
-                }
-                ;
-                calNewData.alpha.Clear();
-                calNewData.alpha = temp;
-                */
                 cor_to_note.content = Correlation_Content_NewAlpha(cor_to_note, calNewData, calOldData);
+
                 //Correation 메모장 파일 저장
                 cor_to_note.Save_CorrelatationFile(cor_to_note.content);
             }
@@ -353,13 +357,18 @@ namespace Auto_Correlation
             {
                 //beta값 계산
                 calNewData.cal_beta(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+
                 cor_to_note.content = Correlation_Content_NewBeta(cor_to_note, calNewData, calOldData);
                 //Correation 메모장 파일 저장
                 cor_to_note.Save_CorrelatationFile(cor_to_note.content);
             }
 
             if (type == "eta")
-            {
+            {               
+                //alpha, beta 값 계산
+                calNewData.cal_alpha(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+                calNewData.cal_beta(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+
                 //eta 기준값 생성
                 calNewData.make_bench_eta(calNewData.benchmark_eta);
 
@@ -373,13 +382,104 @@ namespace Auto_Correlation
                 //Correation 메모장 파일 저장
                 cor_to_note.Save_CorrelatationFile(cor_to_note.content);
             }
+
+            if (type == "all")
+            {
+                //alpha, beta 값 계산
+                calNewData.cal_alpha(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+                calNewData.cal_beta(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
+
+                //eta 기준값 생성
+                calNewData.make_bench_eta(calNewData.benchmark_eta);
+
+                //eta 변화값 생성
+                calNewData.make_list_change_val_std(calNewData.double_r_Value_std, calNewData.double_r_eta_std, calNewData.benchmark_eta);
+                
+                //eta 값 계산
+                calNewData.cal_eta(calNewData.double_r_eta_std, calNewData.beta);
+
+                cor_to_note.content = Correlation_Content_NewAll(cor_to_note, calNewData);
+
+                //Correation 메모장 파일 저장
+                cor_to_note.Save_CorrelatationFile(cor_to_note.content);
+            }
             //메모장 생성
             val_name = "ALPHA";
+            ResetListNewData();
         }
 
-        private void btn_open_cor_Click(object sender, EventArgs e)
+        private void Btn_Open_Cor_Click(object sender, EventArgs e)
         {
             OpenCorFile();
+        }
+
+        private void Btn_Reset_Click(object sender, EventArgs e)
+        {
+            //reset
+            System.Windows.Forms.Application.Restart();
+
+        }
+
+        //기존 cor 보정 데이터로 계속 진행하는 경우
+        private void ResetListNewData() 
+        {
+            //%R값 | List | std, bat
+            r_Value_std.Clear();
+            r_Value_bat.Clear();
+
+            calNewData.string_r_Value_std.Clear();
+            calNewData.string_r_Value_bat.Clear();
+            calNewData.double_r_Value_std.Clear();
+            calNewData.double_r_Value_bat.Clear();
+
+            //Cor Value | List | wave
+            calNewData.alpha.Clear();
+
+            calNewData.beta.Clear();
+
+            calNewData.eta.Clear();
+            calNewData.benchmark_eta.Clear();
+            calNewData.double_r_eta_std.Clear();
+
+            //메모장 | List | 
+            cor_to_note.cor_value.Clear();
+        }
+
+        private void ResetListAll() 
+        {
+            //%R값 | List | std, bat
+            r_Value_std.Clear();
+            r_Value_bat.Clear();
+
+            calNewData.string_r_Value_std.Clear();
+            calNewData.string_r_Value_bat.Clear();
+            calNewData.double_r_Value_std.Clear();
+            calNewData.double_r_Value_bat.Clear();
+
+            calOldData.string_r_Value_std.Clear();
+            calOldData.string_r_Value_bat.Clear();
+            calOldData.double_r_Value_std.Clear();
+            calOldData.double_r_Value_bat.Clear();
+
+            //Cor Value | List | wave
+            calNewData.alpha.Clear();
+
+            calNewData.beta.Clear();
+            
+            calNewData.eta.Clear();
+            calNewData.benchmark_eta.Clear();
+            calNewData.double_r_eta_std.Clear();
+
+            calOldData.alpha.Clear();
+
+            calOldData.beta.Clear();
+
+            calOldData.eta.Clear();
+            calOldData.benchmark_eta.Clear();
+            calOldData.double_r_eta_std.Clear();
+
+            //메모장 | List | 
+            cor_to_note.cor_value.Clear();
         }
     }
 }

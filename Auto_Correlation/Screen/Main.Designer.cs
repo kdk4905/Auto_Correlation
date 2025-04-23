@@ -58,7 +58,7 @@
             this.btn_open_r.TabIndex = 0;
             this.btn_open_r.Text = "%R";
             this.btn_open_r.UseVisualStyleBackColor = true;
-            this.btn_open_r.Click += new System.EventHandler(this.Open_Click);
+            this.btn_open_r.Click += new System.EventHandler(this.R_File_Open_Click);
             // 
             // txtBox_std
             // 
@@ -133,7 +133,7 @@
             this.btn_open_cor.TabIndex = 1;
             this.btn_open_cor.Text = "Correlation File";
             this.btn_open_cor.UseVisualStyleBackColor = true;
-            this.btn_open_cor.Click += new System.EventHandler(this.btn_open_cor_Click);
+            this.btn_open_cor.Click += new System.EventHandler(this.Btn_Open_Cor_Click);
             // 
             // groupBox2
             // 
@@ -217,6 +217,7 @@
             this.btn_reset.TabIndex = 5;
             this.btn_reset.Text = "RESET";
             this.btn_reset.UseVisualStyleBackColor = true;
+            this.btn_reset.Click += new System.EventHandler(this.Btn_Reset_Click);
             // 
             // Main
             // 

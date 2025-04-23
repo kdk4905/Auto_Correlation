@@ -36,6 +36,9 @@ namespace Auto_Correlation
 
         public void make_bench_eta(Dictionary<double, double> dic) 
         {
+            //eta 기준값 만들기 전 초기화
+            dic.Clear ();
+
             double val = 0;
             #region 반사율 0~5
             //반사율 0~5
@@ -299,6 +302,10 @@ namespace Auto_Correlation
             }
 
             //변화값 리스트 생성
+            
+            //eta 변화값 입력전 리스트 초기화
+            change_std.Clear();
+
             for (int i = 0; i < temp.Count; i++) 
             {
                 for (int j = 0; j < eta.Count; j++) 
