@@ -74,7 +74,7 @@ namespace Auto_Correlation.Back
             //                  40             - 2 = 38 //360 ~ 740 
             for (int i = 0; i < newAlpha.Count; i++)
             {
-                form += newAlpha[i].ToString() + "," + "[" + (i + 1) + "]";
+                form += newAlpha[i].ToString() + ","/* + "[" + (i + 1) + "]"*/;
             }
             ////               40             - 1 = 39 //750
             //form += newAlpha[newAlpha.Count - 1].ToString();
@@ -93,7 +93,7 @@ namespace Auto_Correlation.Back
             foreach (double val in oldBeta)
             {
                 count++;
-                form += val.ToString() + "," + "[" + count + "]";
+                form += val.ToString() + ","/* + "[" + count + "]"*/;
             }
             count = 0;
             form += "\r\n";
@@ -140,7 +140,7 @@ namespace Auto_Correlation.Back
             foreach (double val in oldEta)
             {
                 count++;
-                form += val.ToString() + "," + "[" + count + "]";
+                form += val.ToString() + ","/* + "[" + count + "]"*/;
             }
             count = 0;
             form += "\r\n";
@@ -191,7 +191,7 @@ namespace Auto_Correlation.Back
             foreach (double val in oldAlpha)
             {
                 count++;
-                form += val.ToString() + "," + "[" + count + "]";
+                form += val.ToString() + ","/* + "[" + count + "]"*/;
             }
             form += "\r\n";
 
@@ -234,7 +234,7 @@ namespace Auto_Correlation.Back
             //                  40             - 2 = 38 //360 ~ 740 
             for (int i = 0; i < newBeta.Count; i++)
             {
-                form += newBeta[i].ToString() + "," + "[" + (i + 1) + "]";
+                form += newBeta[i].ToString() + ","/* + "[" + (i + 1) + "]"*/;
             }
             //               40             - 1 = 39 //750
             //form += newBeta[newBeta.Count - 1].ToString();
@@ -285,7 +285,7 @@ namespace Auto_Correlation.Back
             foreach (double val in oldEta)
             {
                 count++;
-                form += val.ToString() + "," + "[" + count + "]";
+                form += val.ToString() + ","/* + "[" + count + "]"*/;
             }
             form += "\r\n";
 
@@ -314,6 +314,7 @@ namespace Auto_Correlation.Back
 
         public string Make_cor_value_eta(List<double> newEta, List<double> oldAlpha, List<double> oldBeta, List<double> oldEta)
         {
+            ;
             string form = "";
             string val_alpha = "";
             string val_beta = "";
@@ -364,7 +365,7 @@ namespace Auto_Correlation.Back
             //                  40             - 2 = 38 //360 ~ 740 
             for (int i = 0; i < newEta.Count; i++)
             {
-                form += newEta[i].ToString() + "," + "[" + (i+1) + "]";
+                form += newEta[i].ToString() + ","/* + "[" + (i+1) + "]"*/;
             }
             ////               40             - 1 = 39 //750
             //form += newEta[newEta.Count - 1].ToString();
@@ -376,14 +377,14 @@ namespace Auto_Correlation.Back
             val_eta = form;
             form = "";
 
-            //Alpha
-            form = "SCI_Alpha_Coefficients=";
+            //ALPHA
+            form = "SCI_ALPHA_Coefficients=";
             
             //값 입력 - 360 ~ 750 nm
             foreach (double val in oldAlpha)
             {
                 count++;
-                form += val.ToString() + "," + "[" + count + "]";
+                form += val.ToString() + ","/* + "[" + count + "]"*/;
             }
             form += "\r\n";
 
@@ -398,7 +399,7 @@ namespace Auto_Correlation.Back
             foreach (double val in oldBeta)
             {
                 count++;
-                form += val.ToString() + "," + "[" + count + "]";
+                form += val.ToString() + ","/* + "[" + count + "]"*/;
             }
             form += "\r\n";
 
@@ -501,7 +502,7 @@ namespace Auto_Correlation.Back
             //새로운 알파 보정값 문자로 만들기
             for (int i = 0; i < temp.Count; i++)
             {
-                form += temp[i].ToString() + "," + "[" + (i+1) + "]";
+                form += temp[i].ToString() + ","/* + "[" + (i+1) + "]"*/;
             }
 
             temp.Clear();
@@ -537,7 +538,7 @@ namespace Auto_Correlation.Back
             //새로운 베타 보정값 문자로 만들기
             for (int i = 0; i < temp.Count; i++)
             {
-                form += temp[i].ToString() + "," + "[" + (i + 1) + "]";
+                form += temp[i].ToString() + ","/* + "[" + (i + 1) + "]"*/;
             }
 
             temp.Clear();
@@ -605,7 +606,7 @@ namespace Auto_Correlation.Back
             //새로운 에타 보정값 문자로 만들기
             for (int i = 0; i < temp.Count; i++)
             {
-                form += temp[i].ToString() + "," + "[" + (i + 1) + "]";
+                form += temp[i].ToString() + ","/* + "[" + (i + 1) + "]"*/;
             }
 
             temp.Clear();

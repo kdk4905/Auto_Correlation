@@ -217,6 +217,7 @@ namespace Auto_Correlation
 
                     //메모장 내용 불러오기
                     string content = sr.ReadToEnd();
+                    content = content.Replace(" ", string.Empty);
                     string temp = "";
                     //%R data arr_data에 저장
                     string[] arr_data = content.Split(new string[] { "\r\n" }, StringSplitOptions.None);
@@ -224,10 +225,12 @@ namespace Auto_Correlation
                     //메모장 내용 분류 및 알파, 베타, 에타 데이터 만들기
                     for (int i = 0; i < arr_data.Length; i++)
                     {
+                        ;
                         string type = "";
                     
                         if (arr_data[i] == "[SCI_Coefficients]")
                         {
+                            ;
                             //alpha
                             if (arr_data[i+3].Substring(0,22) == "SCI_ALPHA_Coefficients")
                             {
@@ -344,6 +347,7 @@ namespace Auto_Correlation
 
             if (type == "alpha")
             {
+                ;
                 //alpha값 계산
                 calNewData.cal_alpha(calNewData.double_r_Value_std, calNewData.double_r_Value_bat);
 

@@ -320,9 +320,10 @@ namespace Auto_Correlation
 
         public void parse_list_double(List<string> wave, string type)
         {
+            //2025.05.02 KDK
             for (int i = 0; i < wave.Count; i++)
             {
-                if (type == "alpha") 
+                if (type == "alpha")
                 {
                     alpha.Add(double.Parse(wave[i]));
                 }
@@ -365,6 +366,7 @@ namespace Auto_Correlation
                 double val = Math.Round(std[i] / bat[i] , 8);
                 alpha.Add(val);
             }
+            
         }
 
         public void cal_beta(List<double> std, List<double> bat)
@@ -385,7 +387,8 @@ namespace Auto_Correlation
             for (int i = 0; i < eta_std.Count; i++)
             {
                 result = (multi * bat[i]) / eta_std[i];
-                eta.Add(result);
+                //eta값 8자리로 수정 25.04.23
+                eta.Add(Math.Round(result, 8));
             }
         }
     }
